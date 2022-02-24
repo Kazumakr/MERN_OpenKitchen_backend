@@ -110,46 +110,65 @@ router.get("/", async (req, res) => {
 // 		}
 // 	});
 // });
-// router.get("/:id/comments", (req, res) => {
-// 	Recipe.findById(req.params.id)
-// 		.populate("comments")
-// 		.exec((err, recipe) => {
-// 			if (err) throw new Error(err);
-// 			res.status(200).json(recipe.comments);
-// 		});
-// });
+router.get("/:id/comments", (req, res) => {
+	Recipe.findById(req.params.id)
+		.populate("comments")
+		.exec((err, recipe) => {
+			if (err) throw new Error(err);
+			res.status(200).json(recipe.comments);
+		});
+});
 
-// //like
-
-// router.post("/:id/like", (req, res) => {
-// 	const like = new Like({
-// 		liker: currentUser,
-// 	});
-// 	let isLiked = false;
-// 	like.save((err, result) => {
-// 		if (err) {
-// 			console.log(err);
-// 		} else {
-// 			Recipe.findById(req.params.id)
-// 				.populate("likes")
-// 				.exec((err, recipe) => {
-// 					if (err) {
-// 						console.log(err);
-// 					} else {
-// 						recipe.likes.forEach((item) => {
-// 							if (item.liker === result.liker) {
-// 								recipe.likes.pull(item);
-// 								isLiked = true;
-// 							}
-// 						});
-// 						if (!isLiked) {
-// 							recipe.likes.push(result);
-// 						}
-// 						recipe.save();
-// 					}
-// 				});
-// 		}
-// 	});
-// });
+router.put("/:id/comments", (req, res) => {
+	const comment = {
+		comment: req.body.comment,
+		postedByName: req.body.username,
+		postedById: req.body.userId,
+	};
+	Recipe.findByIdAndUpdate(
+		req.params.id,
+		{
+			$push: { comments: comment },
+		},
+		{ new: true }
+	).exec((err, result) => {
+		if (err) {
+			return res.status(422).json({ error: err });
+		} else {
+			res.json(result);
+		}
+	});
+});
+//like
+router.put("/:id/likes", (req, res) => {
+	Recipe.findByIdAndUpdate(
+		req.params.id,
+		{
+			$push: { likes: req.body.userId },
+		},
+		{ new: true }
+	).exec((err, result) => {
+		if (err) {
+			return res.status(422).json({ error: err });
+		} else {
+			res.json(result);
+		}
+	});
+});
+router.put("/:id/unlikes", (req, res) => {
+	Recipe.findByIdAndUpdate(
+		req.params.id,
+		{
+			$pull: { likes: req.body.userId },
+		},
+		{ new: true }
+	).exec((err, result) => {
+		if (err) {
+			return res.status(422).json({ error: err });
+		} else {
+			res.json(result);
+		}
+	});
+});
 
 module.exports = router;

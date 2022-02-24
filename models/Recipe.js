@@ -23,11 +23,15 @@ const RecipeSchema = new mongoose.Schema(
 			type: Array,
 		},
 
-		likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Like" }],
+		likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 		comments: [
 			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: "Comment",
+				comment: String,
+				postedByName: String,
+				postedById: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "User",
+				},
 			},
 		],
 	},
