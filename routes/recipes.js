@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const Recipe = require("../models/Recipe");
-
+const mongoose = require("mongoose");
 //add new recipe
 router.post("/", async (req, res) => {
 	const newRecipe = new Recipe(req.body);
@@ -58,6 +58,18 @@ router.delete("/:id", async (req, res) => {
 router.get("/:id", async (req, res) => {
 	try {
 		const recipe = await Recipe.findById(req.params.id);
+		res.status(200).json(recipe);
+	} catch (err) {
+		res.status(500).json(err);
+	}
+});
+
+//get by userId
+router.get("/ByUserId/:id", async (req, res) => {
+	try {
+		const recipe = await Recipe.find({
+			userId: mongoose.Types.ObjectId(req.params.id),
+		});
 		res.status(200).json(recipe);
 	} catch (err) {
 		res.status(500).json(err);

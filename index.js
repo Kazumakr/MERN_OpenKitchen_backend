@@ -69,16 +69,16 @@ app.post(
 		return res.send(imgUrl);
 	})
 );
-app.get("/api/files/:filename", (req, res) => {
-	gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-		if (!file || file.length === 0) {
-			return res.status(404).json({
-				err: "No file exist",
-			});
-		}
-		return res.json(file);
-	});
-});
+// app.get("/api/files/:filename", (req, res) => {
+// 	gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+// 		if (!file || file.length === 0) {
+// 			return res.status(404).json({
+// 				err: "No file exist",
+// 			});
+// 		}
+// 		return res.json(file);
+// 	});
+// });
 app.get("/api/image/:filename", (req, res) => {
 	gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
 		if (!file || file.length === 0) {
@@ -99,7 +99,7 @@ app.get("/api/image/:filename", (req, res) => {
 	});
 });
 
-app.delete("/api/file/:filename", async (req, res) => {
+app.delete("/api/image/:filename", async (req, res) => {
 	try {
 		await gfs.files.deleteOne({ filename: req.params.filename });
 		res.send("success");
