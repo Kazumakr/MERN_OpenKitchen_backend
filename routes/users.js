@@ -2,7 +2,6 @@ const router = require("express").Router();
 const User = require("../models/User");
 const Recipe = require("../models/Recipe");
 const bcrypt = require("bcrypt");
-const { mongo, Mongoose } = require("mongoose");
 
 router.put("/:id", async (req, res) => {
 	if (req.body.userId === req.params.id) {
@@ -59,33 +58,6 @@ router.get("/:id", async (req, res) => {
 router.get("/", async (req, res) => {
 	try {
 		const users = await User.find();
-		const usersRes = [];
-		users.map((user, index) => {
-			const { password, ...others } = user._doc;
-			usersRes.push(others);
-		});
-		res.status(200).json(usersRes);
-	} catch (err) {
-		res.status(500).json(err);
-	}
-});
-
-// router.get("/byusername", async (req, res) => {
-// 	const username = req.body.username;
-// 	try {
-// 		// let user;
-// 		const user = await User.findOne({ username });
-
-// 		res.status(200).json(user);
-// 	} catch (err) {
-// 		res.status(500).json(err);
-// 	}
-// });
-
-router.get("/byId", async (req, res) => {
-	// const username = req.query.user;
-	try {
-		const users = await User.findOne();
 		const usersRes = [];
 		users.map((user, index) => {
 			const { password, ...others } = user._doc;

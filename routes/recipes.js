@@ -79,6 +79,7 @@ router.get("/ByUserId/:id", async (req, res) => {
 router.get("/", async (req, res) => {
 	const username = req.query.user;
 	const categoryName = req.query.category;
+	const searchTerm = req.query.search;
 	try {
 		let recipes;
 		if (username) {
@@ -88,6 +89,13 @@ router.get("/", async (req, res) => {
 				categories: {
 					$in: [categoryName],
 				},
+			});
+		} else if (searchTerm) {
+			recipes = await Recipe.find({
+				$or: [
+					{ title: { $regex: searchTerm, $options: "$i" } },
+					{ description: { $regex: searchTerm, $options: "$i" } },
+				],
 			});
 		} else {
 			recipes = await Recipe.find();
