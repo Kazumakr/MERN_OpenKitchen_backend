@@ -64,7 +64,18 @@ router.get("/", async (req, res) => {
 			usersRes.push(others);
 		});
 		res.status(200).json(usersRes);
-		// res.status(200).json(users);
+	} catch (err) {
+		res.status(500).json(err);
+	}
+});
+
+router.get("/byusername", async (req, res) => {
+	const username = req.body.username;
+	try {
+		// let user;
+		const user = await User.findOne({ username });
+
+		res.status(200).json(user);
 	} catch (err) {
 		res.status(500).json(err);
 	}

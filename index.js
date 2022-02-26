@@ -11,6 +11,8 @@ const userRoute = require("./routes/users");
 const recipeRoute = require("./routes/recipes");
 const categoryRoute = require("./routes/categories");
 const multer = require("multer");
+const { GridFsStorage } = require("multer-gridfs-storage");
+const Grid = require("gridfs-stream");
 const path = require("path");
 
 dotenv.config();
@@ -19,11 +21,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(cors());
-
-dotenv.config();
 app.use(express.json());
-app.use("/images", express.static(path.join(__dirname, "/images")));
-
+//connect to mongoDB
 mongoose
 	.connect(process.env.MONGO_URL, {
 		useNewUrlParser: true,
@@ -32,28 +31,85 @@ mongoose
 	.then(console.log("connected to mongoDB"))
 	.catch((err) => console.log(err));
 
-const storage = multer.diskStorage({
-	destination: (req, file, callback) => {
-		callback(null, "images");
-	},
-	filename: (req, file, callback) => {
-		callback(null, req.body.name);
+//init gfs
+let gfs;
+const conn = mongoose.connection;
+conn.once("open", () => {
+	//init stream
+	gridfsBucket = new mongoose.mongo.GridFSBucket(conn.db, {
+		bucketName: "photos",
+	});
+	gfs = Grid(conn.db, mongoose.mongo);
+	gfs.collection("photos");
+});
+
+//storage engine
+const storage = new GridFsStorage({
+	url: process.env.MONGO_URL,
+	options: { useNewUrlParser: true },
+	file: (req, file) => {
+		const match = ["image/png", "image/jpeg", "image/jpg"];
+		if (match.indexOf(file.mimetype) === -1) {
+			const filename = `${file.originalname}`;
+			return filename;
+		}
+		return {
+			bucketName: "photos",
+			filename: `${file.originalname}`,
+		};
 	},
 });
 
 const upload = multer({ storage: storage });
+
 app.post(
 	"/api/upload",
 	upload.single("file", (req, res) => {
-		res.status(200).json("File has been uploaded");
+		const imgUrl = `http://localhost:5000/api/file/${req.file.filename}`;
+		return res.send(imgUrl);
 	})
 );
+app.get("/api/files/:filename", (req, res) => {
+	gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+		if (!file || file.length === 0) {
+			return res.status(404).json({
+				err: "No file exist",
+			});
+		}
+		return res.json(file);
+	});
+});
+app.get("/api/image/:filename", (req, res) => {
+	gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+		if (!file || file.length === 0) {
+			return res.status(404).json({
+				err: "No file exist",
+			});
+		}
+		if (
+			file.contentType === "image/jpeg" ||
+			file.contentType === "image/png" ||
+			file.contentType === "image/jpg"
+		) {
+			const readstream = gridfsBucket.openDownloadStream(file._id);
+			readstream.pipe(res);
+		} else {
+			res.status(404).json({ err: "Not an image" });
+		}
+	});
+});
+
+app.delete("/api/file/:filename", async (req, res) => {
+	try {
+		await gfs.files.deleteOne({ filename: req.params.filename });
+		res.send("success");
+	} catch (error) {
+		console.log(error);
+		res.send("An error occured.");
+	}
+});
 
 app.post("/api/send_mail", cors(), async (req, res) => {
-	// let { name } = req.body;
-	// let { email } = req.body;
-	// let { subject } = req.body;
-	// let { text } = req.body;
 	let { name, email, subject, text } = req.body;
 	const transport = nodemailer.createTransport({
 		host: process.env.MAIL_HOST,

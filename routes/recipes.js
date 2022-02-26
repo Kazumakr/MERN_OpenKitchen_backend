@@ -1,8 +1,7 @@
 const router = require("express").Router();
-const User = require("../models/User");
 const Recipe = require("../models/Recipe");
-const Comment = require("../models/Comment");
 
+//add new recipe
 router.post("/", async (req, res) => {
 	const newRecipe = new Recipe(req.body);
 	try {
@@ -12,7 +11,7 @@ router.post("/", async (req, res) => {
 		res.status(500).json(err);
 	}
 });
-
+//update recipe
 router.put("/:id", async (req, res) => {
 	try {
 		const recipe = await Recipe.findById(req.params.id);
@@ -36,7 +35,7 @@ router.put("/:id", async (req, res) => {
 		res.status(500).json(err);
 	}
 });
-
+//delete recipe
 router.delete("/:id", async (req, res) => {
 	try {
 		const recipe = await Recipe.findById(req.params.id);
@@ -55,7 +54,7 @@ router.delete("/:id", async (req, res) => {
 		res.status(500).json(err);
 	}
 });
-
+//get single recipe
 router.get("/:id", async (req, res) => {
 	try {
 		const recipe = await Recipe.findById(req.params.id);
@@ -64,7 +63,7 @@ router.get("/:id", async (req, res) => {
 		res.status(500).json(err);
 	}
 });
-
+//get recipes by category or user
 router.get("/", async (req, res) => {
 	const username = req.query.user;
 	const categoryName = req.query.category;
@@ -86,39 +85,7 @@ router.get("/", async (req, res) => {
 		res.status(500).json(err);
 	}
 });
-
-// router.post("/:id/comments", (req, res) => {
-// 	const comment = new Comment({
-// 		author: req.body.username,
-// 		comment: req.body.comment,
-// 	});
-// 	comment.save((err, result) => {
-// 		if (err) {
-// 			console.log(err);
-// 		} else {
-// 			Recipe.findById(req.params.id)
-// 				.populate("comments")
-// 				.exec((err, recipe) => {
-// 					if (err) {
-// 						console.log(err);
-// 					} else {
-// 						recipe.comments.push(result);
-// 						recipe.save();
-// 						console.log(recipe);
-// 					}
-// 				});
-// 		}
-// 	});
-// });
-router.get("/:id/comments", (req, res) => {
-	Recipe.findById(req.params.id)
-		.populate("comments")
-		.exec((err, recipe) => {
-			if (err) throw new Error(err);
-			res.status(200).json(recipe.comments);
-		});
-});
-
+//comment
 router.put("/:id/comments", (req, res) => {
 	const comment = {
 		comment: req.body.comment,
