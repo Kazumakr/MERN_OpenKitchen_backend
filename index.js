@@ -22,6 +22,7 @@ app.use(bodyParser.json());
 
 app.use(cors());
 app.use(express.json());
+
 //connect to mongoDB
 mongoose
 	.connect(process.env.MONGO_URL, {
