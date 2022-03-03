@@ -2,8 +2,6 @@
 
 This project is a recipe blog for sharing cooking recipes.
 
-![User visit public and Home page](http://i.imgur.com/ORCGHHY.png)
-
 Project Link : [https://unruffled-jepsen-33fb63.netlify.app/]
 Frontend : [https://github.com/Kazumakr/MERN_OpenKitchen_front]
 
@@ -102,7 +100,7 @@ Recipe
 
 `PUT /api/recipes/:id`
 
-## Delete a recipe
+### Delete a recipe
 
 `DELETE /api/recipes/:id`
 
@@ -136,7 +134,7 @@ Recipe
 
 `PUT /api/recipes/:id/unlikes`
 
-Categories
+## Categories
 
 ### Create a new category
 
@@ -146,23 +144,17 @@ Categories
 
 `GET /api/categories/`
 
-Image
+## Image
 
-## Upload an image to DB
-
-### Request
+### Upload an image to DB
 
 `POST /api/upload/`
 
-## Get an image from DB
-
-### Request
+### Get an image from DB
 
 `GET /api/image/:filename`
 
-## Delete an image from DB
-
-### Request
+### Delete an image from DB
 
 `DELETE /api/image/:filename`
 
