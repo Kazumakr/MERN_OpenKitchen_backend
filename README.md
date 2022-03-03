@@ -1,4 +1,4 @@
-# <Open Kitchen-Backend>
+# Open Kitchen-Backend
 
 This project is a recipe blog for sharing cooking recipes.
    
