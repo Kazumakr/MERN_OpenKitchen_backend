@@ -66,7 +66,7 @@ const upload = multer({ storage: storage });
 app.post(
 	"/api/upload",
 	upload.single("file", (req, res) => {
-		const imgUrl = `http://localhost:5000/api/file/${req.file.filename}`;
+		const imgUrl = `https://mern-openkitchen.herokuapp.com/api/file/${req.file.filename}`;
 		return res.send(imgUrl);
 	})
 );
